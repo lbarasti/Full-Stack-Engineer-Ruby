@@ -3,6 +3,7 @@ import styles from './App.css';
 import Grid from 'react-bootstrap/lib/Grid';
 import Row from 'react-bootstrap/lib/Row';
 import Col from 'react-bootstrap/lib/Col';
+import Alert from 'react-bootstrap/lib/Alert';
 import InfiniteScroll from 'react-infinite-scroller';
 import ComicBook from './ComicBook';
 import TopBar from './TopBar';
@@ -14,7 +15,13 @@ class App extends React.Component {
     const currentDate = (new Date()).toJSON().slice(0,10);
     this.getComics = Api.getComics(currentDate);
     this.itemsPerPage = 20;
-    this.state = {offset: 0, hasMoreItems: true, items: [], characterId: null};
+    this.state = {
+      offset: 0,
+      hasMoreItems: true,
+      items: [],
+      characterId: null,
+      showAlert: false
+    };
   }
 
   loadMoreComics(page) {
@@ -35,19 +42,37 @@ class App extends React.Component {
   }
 
   handleInput(token) {
-    Api.findCharacter(token).then(res => {
-      if(res.count == 0) {
-        // TODO display notification
-      } else {
-        this.setState({
-          characterId: res.results[0].id,
-          offset: 0,
-          hasMoreItems: true,
-          items: []
-        });
-
-      }
-    })
+    if(token === "") {
+      this.setState({
+        characterId: null,
+        items: [],
+        hasMoreItems: true,
+        offset: 0,
+        showAlert: false
+      })
+    } else {
+      Api.findCharacter(token).then(res => {
+        if(res.count == 0) {
+          this.setState({
+            characterId: null,
+            showAlert: true,
+            offset: 0,
+            hasMoreItems: false,
+            items: []
+          });
+        } else {
+          const characterId = res.results[0].id
+          if(characterId !== this.state.characterId)
+            this.setState({
+              characterId: characterId,
+              offset: 0,
+              hasMoreItems: true,
+              items: [],
+              showAlert: false
+            });
+        }
+      })
+    }
   }
 
   toggleFavourite(id) {
@@ -65,11 +90,20 @@ class App extends React.Component {
     }
   }
 
+  characterNotFound() {
+    return <Alert bsStyle="warning">
+      <strong>Oh no!</strong> I could not find that character :(
+    </Alert>
+  }
+
   render() {
+    const alert = this.state.showAlert ? this.characterNotFound() : undefined;
+
     return (
       <div className={styles.app}>
         <TopBar onInput={this.handleInput.bind(this)}/>
         <Grid>
+          {alert}
           <InfiniteScroll
             className={"row"}
             pageStart={0}
