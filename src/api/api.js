@@ -1,23 +1,29 @@
 import config from '../config'
 
 const marvelKey = config.marvelKey
-const beginningOfTime = "2017-04-01"
+const beginningOfTime = "1930-04-01"
 
-const comicsUrl = (from, to, limit, offset) =>
- `${config.comicsUrl}?format=comic&formatType=comic&dateRange=${from}%2C${to}&limit=${limit}&noVariants=true&offset=${offset}&apikey=${marvelKey}`
+const comicsUrl = (from, to, limit, offset, characterId) => {
+  const queryString = `format=comic&formatType=comic&dateRange=${from}%2C${to}&limit=${limit}&noVariants=true&offset=${offset}&apikey=${marvelKey}`;
+  return characterId ?
+    `${config.comicsForCharacterUrl.replace(":characterId", characterId)}?${queryString}` :
+    `${config.comicsUrl}?${queryString}`
+}
 
-const characterUrl = (token) =>
-  `${config.characterUrl}?nameStartsWith=${token}&limit=1&apikey=${marvelKey}`
+const characterUrl = (name) =>
+  `${config.characterUrl}?name=${name}&limit=1&apikey=${marvelKey}`
 
 const upvotesUrl = (id) => `${config.upvotesUrl}/${id}`
 
-const getComics = (to) => (offset) => {
-  return fetch(comicsUrl(beginningOfTime, to, 20, offset)).then(res => res.json())
+const getComics = (to) => (offset, characterId) => {
+  const url = comicsUrl(beginningOfTime, to, 20, offset, characterId);
+  console.log(`GET ${url}`);
+  return fetch(url).then(res => res.json())
     .then(wrapper => wrapper.data)
 }
 
-const findCharacter = (token) => {
-  return fetch(characterUrl(token)).then(res => res.json())
+const findCharacter = (name) => {
+  return fetch(characterUrl(name)).then(res => res.json())
     .then(wrapper => wrapper.data)
 }
 
@@ -29,7 +35,6 @@ const toggleFavourite = (id) => {
 }
 
 const Api = {
-  comicsUrl,
   getComics,
   toggleFavourite,
   findCharacter

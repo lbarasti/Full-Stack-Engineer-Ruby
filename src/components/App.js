@@ -14,11 +14,11 @@ class App extends React.Component {
     const currentDate = (new Date()).toJSON().slice(0,10);
     this.getComics = Api.getComics(currentDate);
     this.itemsPerPage = 20;
-    this.state = {offset: 0, hasMoreItems: true, items: []};
+    this.state = {offset: 0, hasMoreItems: true, items: [], characterId: null};
   }
 
   loadMoreComics(page) {
-    this.getComics((page - 1) * this.itemsPerPage).then(({count, offset, limit, total, results}) => {
+    this.getComics(this.state.offset, this.state.characterId).then(({count, offset, limit, total, results}) => {
       console.log(`count: ${count}, offset: ${offset}, total: ${total}`);
       const comics = results.map(({id, title, thumbnail}) => {
         return {id, title, image: `${thumbnail.path}.${thumbnail.extension}`}
@@ -37,9 +37,14 @@ class App extends React.Component {
   handleInput(token) {
     Api.findCharacter(token).then(res => {
       if(res.count == 0) {
-
+        // TODO display notification
       } else {
-        const characterId = res.results[0].id;
+        this.setState({
+          characterId: res.results[0].id,
+          offset: 0,
+          hasMoreItems: true,
+          items: []
+        });
 
       }
     })
