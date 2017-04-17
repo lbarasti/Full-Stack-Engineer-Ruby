@@ -22,3 +22,7 @@
 .heart:hover {
   background: url('/assets/heart_hover.png') no-repeat;
 }
+
+.heart_on.heart:hover {
+  background: url('/assets/heart_on.png') no-repeat;
+}
