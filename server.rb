@@ -23,6 +23,18 @@ Cuba.define do
     end
   end
 
+  on "favourites" do |user_id|
+    on get do
+      user_id = req.session[:user_id]
+      unless user_id.nil?
+        res.headers["Content-Type"] = "application/javascript; charset=utf-8"
+        res.write DB.get_favourites(user_id)
+      else
+        res.status = 401
+      end
+    end
+  end
+
   # serving static files
   on get do
     on root do

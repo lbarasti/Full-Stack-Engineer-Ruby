@@ -34,9 +34,17 @@ const toggleFavourite = (id) => {
   });
 }
 
+const getFavourites = () => {
+  return fetch(config.favouritesUrl, {
+    method: "GET",
+    credentials: "include"
+  }).then(res => res.json());
+}
+
 const Api = {
   getComics,
   toggleFavourite,
+  getFavourites,
   findCharacter
 }
 

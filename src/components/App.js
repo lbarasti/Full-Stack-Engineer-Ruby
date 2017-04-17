@@ -13,6 +13,11 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     const currentDate = (new Date()).toJSON().slice(0,10);
+    Api.getFavourites().then(comic_ids => {
+      const favourites = {};
+      comic_ids.forEach(comic_id => { favourites[comic_id] = true });
+      this.setState({favourites});
+    });
     this.getComics = Api.getComics(currentDate);
     this.itemsPerPage = 20;
     this.state = {
@@ -20,7 +25,8 @@ class App extends React.Component {
       hasMoreItems: true,
       items: [],
       characterId: null,
-      showAlert: false
+      showAlert: false,
+      favourites: {}
     };
   }
 
@@ -30,7 +36,7 @@ class App extends React.Component {
       const comics = results.map(({id, title, thumbnail}) => {
         return {id, title, image: `${thumbnail.path}.${thumbnail.extension}`}
       }).map(({id, title, image}) => {
-        return {id, title, image, key: id, favourite: false}
+        return {id, title, image, key: id, favourite: this.state.favourites[id]}
       });
 
       this.setState({
