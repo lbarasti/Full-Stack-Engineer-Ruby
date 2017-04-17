@@ -1,5 +1,5 @@
 const config = {
-  upvotesUrl: "http://localhost:5555/upvotes",
+  upvotesUrl: "/upvotes",
   comicsUrl: "https://gateway.marvel.com:443/v1/public/comics",
   comicsForCharacterUrl: "https://gateway.marvel.com:443/v1/public/characters/:characterId/comics",
   characterUrl: "https://gateway.marvel.com:443/v1/public/characters",
