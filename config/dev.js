@@ -48,6 +48,10 @@ module.exports = {
       '/upvotes': {
         target: 'http://127.0.0.1:5555',
         changeOrigin: true
+      },
+      '/' : {
+        target: 'http://127.0.0.1:5555',
+        changeOrigin: true
       }
     }
   },
