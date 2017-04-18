@@ -31,6 +31,11 @@ class App extends React.Component {
   }
 
   loadMoreComics(page) {
+    if(this.state.loading) { // avoid issuing multiple calls for the same offset
+      return null
+    }
+    
+    this.setState({ loading: true });
     this.getComics(this.state.offset, this.state.characterId).then(({count, offset, limit, total, results}) => {
       console.log(`count: ${count}, offset: ${offset}, total: ${total}`);
 
@@ -55,7 +60,8 @@ class App extends React.Component {
       this.setState({
         offset: this.state.offset + count,
         hasMoreItems: count + offset < total,
-        items: this.state.items.concat(comics)
+        items: this.state.items.concat(comics),
+        loading: false
       })
     });
   }
