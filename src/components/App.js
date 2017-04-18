@@ -33,10 +33,23 @@ class App extends React.Component {
   loadMoreComics(page) {
     this.getComics(this.state.offset, this.state.characterId).then(({count, offset, limit, total, results}) => {
       console.log(`count: ${count}, offset: ${offset}, total: ${total}`);
+
       const comics = results.map(({id, title, thumbnail}) => {
-        return {id, title, image: `${thumbnail.path}.${thumbnail.extension}`}
-      }).map(({id, title, image}) => {
-        return {id, title, image, key: id, favourite: this.state.favourites[id]}
+        return {
+          id,
+          title,
+          image: `${thumbnail.path}.${thumbnail.extension}`,
+          key: id,
+          favourite: this.state.favourites[id]
+        }
+      });
+
+      const ids = comics.map(comic => comic.id);
+      Api.getVotes(ids).then(votes => {
+        const idToVote = ids.reduce((obj, id, idx) => {return Object.assign(obj, {[id]: votes[idx]})}, {});
+        this.setState({
+          items: this.state.items.map(comic => idToVote[comic.id] ? Object.assign(comic, {votes: idToVote[comic.id]}) : comic)
+        });
       });
 
       this.setState({
@@ -81,16 +94,22 @@ class App extends React.Component {
     }
   }
 
-  toggleFavourite(id) {
+  addFavourite(id) {
     return (evt) => {
       const comic = this.state.items.find((comic) => comic.id == id);
       if (!comic.favourite) {
-        Api.toggleFavourite(id);
+        Api.addFavourite(id);
         // optimistic update
         this.setState({
           items: this.state.items.map((item) => {
-            return item.id == id ? Object.assign({}, item, {favourite: true}) : item
-          })
+            return item.id == id ?
+              Object.assign({}, item, {
+                favourite: true,
+                votes: item.votes ? item.votes + 1 : 1
+              }) :
+              item
+          }),
+          favourites: Object.assign({[id]: true}, this.state.favourites)
         })
       }
     }
@@ -117,9 +136,9 @@ class App extends React.Component {
             hasMore={this.state.hasMoreItems}
             loader={"Loading"}>
               {this.state.items.map((props, idx) => (
-              <Col key={`${idx}:${this.props.key}`} xs={6} md={4}>
+              <Col key={`${idx}:${props.key}`} xs={6} md={4}>
                 <ComicBook {...props}
-                           toggleFavourite={this.toggleFavourite.bind(this)} />
+                           addFavourite={this.addFavourite.bind(this)} />
               </Col>
               ))}
           </InfiniteScroll>

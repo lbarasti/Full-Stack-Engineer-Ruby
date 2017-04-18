@@ -38,8 +38,18 @@ module.exports = {
     contentBase: resolve(__dirname, '../dist'),
     // match the output path
 
-    publicPath: '/'
+    publicPath: '/',
     // match the output `publicPath`
+    proxy: {
+      '/favourites': {
+        target: 'http://127.0.0.1:5555',
+        changeOrigin: true
+      },
+      '/upvotes': {
+        target: 'http://127.0.0.1:5555',
+        changeOrigin: true
+      }
+    }
   },
 
   module: {

@@ -8,8 +8,11 @@ class ComicBook extends React.Component {
     return (
       <div className={styles.comicbook}>
         <Image src={this.props.image} responsive />
-        <div className={`${this.props.favourite ? styles.heart_on : styles.heart_off} ${styles.heart}`}
-             onClick={this.props.toggleFavourite(this.props.id)} />
+        <div className={styles.infobar}>
+          <div className={styles.upvotes}>{this.props.votes || ""}</div>
+          <div className={`${this.props.favourite ? styles.heart_on : styles.heart_off} ${styles.heart}`}
+               onClick={this.props.addFavourite(this.props.id)} />
+        </div>
       </div>
     )
   }

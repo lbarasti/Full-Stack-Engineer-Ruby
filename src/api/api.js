@@ -27,7 +27,7 @@ const findCharacter = (name) => {
     .then(wrapper => wrapper.data)
 }
 
-const toggleFavourite = (id) => {
+const addFavourite = (id) => {
   fetch(upvotesUrl(id), {
     method: "POST",
     credentials: "include"
@@ -41,10 +41,19 @@ const getFavourites = () => {
   }).then(res => res.json());
 }
 
+
+const getVotes = (comic_ids) => {
+  return fetch(`${config.upvotesUrl}?comic_ids=${comic_ids.join(",")}`, {
+    method: "GET",
+    credentials: "include"
+  }).then(res => res.json());
+}
+
 const Api = {
   getComics,
-  toggleFavourite,
+  addFavourite,
   getFavourites,
+  getVotes,
   findCharacter
 }
 
